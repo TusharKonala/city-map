@@ -302,7 +302,13 @@ function HexCompass({
   ];
 
   return (
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 w-32 h-32">
+    <div
+      className="
+    absolute z-30 w-28 h-28
+    top-2 left-1/2 -translate-x-1/2
+    md:top-6 md:right-6 md:left-auto md:translate-x-0
+  "
+    >
       <svg viewBox="0 0 100 100" className="w-full h-full">
         {points.map((p, i) => {
           const next = points[(i + 1) % points.length];
@@ -323,7 +329,7 @@ function HexCompass({
                 ${
                   activeIndex === i
                     ? "fill-blue-500"
-                    : "fill-gray-700 hover:fill-gray-600"
+                    : "fill-gray-700 active:fill-gray-600"
                 }`}
               stroke="#1f2937"
               strokeWidth="1"
@@ -346,7 +352,7 @@ function MarkerDetailCard({
   if (!data) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-sm">
       <div className="bg-gradient-to-br from-yellow-500 to-amber-800 p-[2px] rounded-xl">
         <div className="bg-gray-900 rounded-xl p-4 text-white">
           <div className="flex justify-between items-center mb-2">
@@ -466,8 +472,10 @@ export default function Home() {
         >
           →
         </button>
-
-        <div className="w-full aspect-video max-h-[600px] mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700 relative">
+        <div
+          className="relative w-full mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700
+    h-[300px] md:h-[600px] mt-16 md:mt-0"
+        >
           <Canvas camera={{ position: [0, 15, 25], fov: 60 }} shadows>
             <Suspense fallback={null}>
               <CityScene
