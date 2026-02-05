@@ -135,7 +135,13 @@ function RotatingControls({
 }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const startTimeRef = useRef(0);
-  const MIN_ANIMATION_DURATION = 20; // 50ms minimum
+  const onCompleteRef = useRef(onComplete);
+  const MIN_ANIMATION_DURATION = 20;
+
+  // keep ref updated without breaking deps
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useFrame((state) => {
     if (!controlsRef.current || !isAnimating) return;
@@ -148,22 +154,19 @@ function RotatingControls({
     const elapsed = state.clock.elapsedTime * 1000 - startTimeRef.current;
 
     if (Math.abs(normalizedDiff) > 0.01 && elapsed < MIN_ANIMATION_DURATION) {
-      const easeFactor = Math.min(0.35, Math.abs(normalizedDiff) * 0.6);
+      const easeFactor = 0.4;
       controlsRef.current.setAzimuthalAngle(
         currentAzimuthal + normalizedDiff * easeFactor,
       );
     } else {
-      // Force complete after minimum duration
       setIsAnimating(false);
-      onComplete();
+      onCompleteRef.current();
     }
   });
 
   useEffect(() => {
-    if (targetRotation !== undefined) {
-      startTimeRef.current = performance.now();
-      setIsAnimating(true);
-    }
+    startTimeRef.current = performance.now();
+    setIsAnimating(true);
   }, [targetRotation]);
 
   return null;
@@ -247,6 +250,57 @@ function CityScene({
   );
 }
 
+function HexCompass({
+  activeIndex,
+  onSelect,
+}: {
+  activeIndex: number;
+  onSelect: (index: number) => void;
+}) {
+  const center = { x: 50, y: 50 };
+  const points = [
+    [50, 0], // top
+    [100, 25], // top-right
+    [100, 75], // bottom-right
+    [50, 100], // bottom
+    [0, 75], // bottom-left
+    [0, 25], // top-left
+  ];
+
+  return (
+    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 w-32 h-32">
+      <svg viewBox="0 0 100 100" className="w-full h-full">
+        {points.map((p, i) => {
+          const next = points[(i + 1) % points.length];
+
+          const d = `
+            M ${center.x} ${center.y}
+            L ${p[0]} ${p[1]}
+            L ${next[0]} ${next[1]}
+            Z
+          `;
+
+          return (
+            <path
+              key={i}
+              d={d}
+              onClick={() => onSelect(i)}
+              className={`cursor-pointer transition-colors
+                ${
+                  activeIndex === i
+                    ? "fill-blue-500"
+                    : "fill-gray-700 hover:fill-gray-600"
+                }`}
+              stroke="#1f2937"
+              strokeWidth="1"
+            />
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
 export default function Home() {
   const [currentView, setCurrentView] = useState(0);
   const [targetRotation, setTargetRotation] = useState(0);
@@ -255,16 +309,22 @@ export default function Home() {
   const controlsRef = useRef<any>(null);
 
   const rotateToView = (direction: "next" | "prev") => {
-    if (isTransitioning) return;
-
-    // Reset immediately for instant responsiveness
-    setIsTransitioning(true);
-
     const newView =
       direction === "next" ? (currentView + 1) % 6 : (currentView - 1 + 6) % 6;
 
+    if (newView === currentView) return;
+
+    setIsTransitioning(true);
     setCurrentView(newView);
     setTargetRotation((newView * Math.PI) / 3);
+  };
+
+  const rotateToIndex = (index: number) => {
+    if (index === currentView) return;
+
+    setIsTransitioning(true);
+    setCurrentView(index);
+    setTargetRotation((index * Math.PI) / 3);
   };
 
   return (
@@ -272,8 +332,9 @@ export default function Home() {
       <div className="max-w-6xl mx-auto">
         {/* Left Previous Button */}
         <button
+          disabled={isTransitioning}
           onClick={() => rotateToView("prev")}
-          className={`absolute left-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl ${isTransitioning ? "opacity-50 cursor-not-allowed animate-pulse" : ""}`}
+          className={`absolute left-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl  ${isTransitioning ? "opacity-50 cursor-not-allowed animate-pulse" : ""}`}
           title="Previous View"
         >
           ←
@@ -281,8 +342,9 @@ export default function Home() {
 
         {/* Right Next Button */}
         <button
+          disabled={isTransitioning}
           onClick={() => rotateToView("next")}
-          className={`absolute right-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl ${isTransitioning ? "opacity-50 cursor-not-allowed animate-pulse" : ""}`}
+          className={`absolute right-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl  ${isTransitioning ? "opacity-50 cursor-not-allowed animate-pulse" : ""}`}
           title="Next View"
         >
           →
@@ -313,6 +375,7 @@ export default function Home() {
             </Suspense>
           </Canvas>
         </div>
+        <HexCompass activeIndex={currentView} onSelect={rotateToIndex} />
       </div>
     </main>
   );
