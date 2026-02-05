@@ -3,6 +3,28 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Sphere, Text } from "@react-three/drei";
 import { Suspense, useRef, useState, useEffect } from "react";
+import * as THREE from "three";
+import { useThree } from "@react-three/fiber";
+
+function Skybox() {
+  const { scene } = useThree();
+
+  useEffect(() => {
+    const loader = new THREE.CubeTextureLoader();
+    const texture = loader.load([
+      "/textures/skybox/right.png",
+      "/textures/skybox/left.png",
+      "/textures/skybox/up.png",
+      "/textures/skybox/down.png",
+      "/textures/skybox/front.png",
+      "/textures/skybox/back.png",
+    ]);
+
+    scene.background = texture;
+  }, [scene]);
+
+  return null;
+}
 
 function CityGround() {
   return (
@@ -84,7 +106,7 @@ function RotatingControls({
 }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const startTimeRef = useRef(0);
-  const MIN_ANIMATION_DURATION = 800; // 800ms minimum
+  const MIN_ANIMATION_DURATION = 50; // 50ms minimum
 
   useFrame((state) => {
     if (!controlsRef.current || !isAnimating) return;
@@ -129,6 +151,7 @@ function CityScene({
 }) {
   return (
     <>
+      <Skybox />
       <ambientLight intensity={0.4} />
       <directionalLight
         position={[10, 10, 5]}
