@@ -1,8 +1,8 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Sphere, Text } from "@react-three/drei";
-import { Suspense } from "react";
+import { Suspense, useRef, useState, useEffect } from "react";
 
 function CityGround() {
   return (
@@ -73,7 +73,36 @@ function Marker({
   );
 }
 
-function CityScene() {
+function RotatingControls({
+  targetRotation,
+  controlsRef,
+}: {
+  targetRotation: number;
+  controlsRef: React.RefObject<any>;
+}) {
+  useFrame(() => {
+    if (controlsRef.current) {
+      const currentAzimuthal = controlsRef.current.getAzimuthalAngle();
+      const diff = targetRotation - currentAzimuthal;
+      const normalizedDiff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
+
+      if (Math.abs(normalizedDiff) > 0.01) {
+        controlsRef.current.setAzimuthalAngle(
+          currentAzimuthal + normalizedDiff * 0.1,
+        );
+      }
+    }
+  });
+  return null;
+}
+
+function CityScene({
+  targetRotation,
+  controlsRef,
+}: {
+  targetRotation: number;
+  controlsRef: React.RefObject<any>;
+}) {
   return (
     <>
       <ambientLight intensity={0.4} />
@@ -115,22 +144,61 @@ function CityScene() {
       <Marker position={[12, 0, -5] as [number, number, number]} id={4} />
       <Marker position={[-5, 0, 12] as [number, number, number]} id={5} />
       <Marker position={[8, 0, 8] as [number, number, number]} id={6} />
+
+      <RotatingControls
+        targetRotation={targetRotation}
+        controlsRef={controlsRef}
+      />
     </>
   );
 }
 
 export default function Home() {
+  const [currentView, setCurrentView] = useState(0);
+  const [targetRotation, setTargetRotation] = useState(0);
+  const controlsRef = useRef<any>(null);
+
+  const rotateToView = (direction: "next" | "prev") => {
+    const newView =
+      direction === "next" ? (currentView + 1) % 6 : (currentView - 1 + 6) % 6;
+
+    setCurrentView(newView);
+    setTargetRotation((newView * Math.PI) / 3);
+  };
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8 relative">
       <div className="max-w-6xl mx-auto">
-        <div className="w-full aspect-video max-h-[600px] mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700">
+        {/* Left Previous Button */}
+        <button
+          onClick={() => rotateToView("prev")}
+          className="absolute left-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl"
+          title="Previous View"
+        >
+          ←
+        </button>
+
+        {/* Right Next Button */}
+        <button
+          onClick={() => rotateToView("next")}
+          className="absolute right-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl"
+          title="Next View"
+        >
+          →
+        </button>
+
+        <div className="w-full aspect-video max-h-[600px] mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700 relative">
           <Canvas camera={{ position: [0, 15, 25], fov: 60 }} shadows>
             <Suspense fallback={null}>
-              <CityScene />
+              <CityScene
+                targetRotation={targetRotation}
+                controlsRef={controlsRef}
+              />
               <OrbitControls
+                ref={controlsRef}
                 enablePan={false}
                 enableZoom={true}
-                enableRotate={true}
+                enableRotate={false}
                 minDistance={15}
                 maxDistance={50}
               />
