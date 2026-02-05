@@ -30,22 +30,26 @@ function GLBModel({
   path,
   position = [0, 0, 0],
   targetSize = 10, // desired max size in world units
+  scale = 1,
 }: {
   path: string;
   position?: [number, number, number];
   targetSize?: number;
+  scale?: number;
 }) {
   const { scene } = useGLTF(path);
 
   useEffect(() => {
+    scene.scale.set(1, 1, 1);
+
     const box = new THREE.Box3().setFromObject(scene);
     const size = new THREE.Vector3();
     box.getSize(size);
 
     const maxAxis = Math.max(size.x, size.y, size.z);
-    const scale = targetSize / maxAxis;
+    const autoScale = targetSize / maxAxis;
 
-    scene.scale.setScalar(scale);
+    scene.scale.setScalar(autoScale * scale);
   }, [scene, targetSize]);
 
   return <primitive object={scene} position={position} />;
@@ -131,7 +135,7 @@ function RotatingControls({
 }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const startTimeRef = useRef(0);
-  const MIN_ANIMATION_DURATION = 50; // 50ms minimum
+  const MIN_ANIMATION_DURATION = 20; // 50ms minimum
 
   useFrame((state) => {
     if (!controlsRef.current || !isAnimating) return;
@@ -144,7 +148,7 @@ function RotatingControls({
     const elapsed = state.clock.elapsedTime * 1000 - startTimeRef.current;
 
     if (Math.abs(normalizedDiff) > 0.01 && elapsed < MIN_ANIMATION_DURATION) {
-      const easeFactor = Math.min(0.15, Math.abs(normalizedDiff) * 0.3);
+      const easeFactor = Math.min(0.35, Math.abs(normalizedDiff) * 0.6);
       controlsRef.current.setAzimuthalAngle(
         currentAzimuthal + normalizedDiff * easeFactor,
       );
@@ -188,20 +192,20 @@ function CityScene({
       <CityGround />
 
       {/* Assembled GLB assets from ZIP */}
-      <GLBModel path="/models/map.glb" scale={2} />
+      <GLBModel path="/models/map.glb" scale={0.5} />
 
-      <GLBModel path="/models/wallGate.glb" position={[0, 0, -8]} scale={1.5} />
+      <GLBModel path="/models/wallGate.glb" position={[0, 0, -8]} scale={1} />
 
       <GLBModel
         path="/models/fireTower.glb"
         position={[11, 0, 7]}
-        scale={1.5}
+        scale={0.7}
       />
 
       <GLBModel
         path="/models/centerCrystal.glb"
         position={[0, 0, 0]}
-        scale={1.2}
+        scale={0.7}
       />
 
       {/* 4 Buildings */}
