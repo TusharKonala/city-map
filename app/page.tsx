@@ -76,32 +76,56 @@ function Marker({
 function RotatingControls({
   targetRotation,
   controlsRef,
+  onComplete,
 }: {
   targetRotation: number;
   controlsRef: React.RefObject<any>;
+  onComplete: () => void;
 }) {
-  useFrame(() => {
-    if (controlsRef.current) {
-      const currentAzimuthal = controlsRef.current.getAzimuthalAngle();
-      const diff = targetRotation - currentAzimuthal;
-      const normalizedDiff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const startTimeRef = useRef(0);
+  const MIN_ANIMATION_DURATION = 800; // 800ms minimum
 
-      if (Math.abs(normalizedDiff) > 0.01) {
-        controlsRef.current.setAzimuthalAngle(
-          currentAzimuthal + normalizedDiff * 0.1,
-        );
-      }
+  useFrame((state) => {
+    if (!controlsRef.current || !isAnimating) return;
+
+    const currentAzimuthal = controlsRef.current.getAzimuthalAngle?.();
+    if (currentAzimuthal === undefined) return;
+
+    const diff = targetRotation - currentAzimuthal;
+    const normalizedDiff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
+    const elapsed = state.clock.elapsedTime * 1000 - startTimeRef.current;
+
+    if (Math.abs(normalizedDiff) > 0.01 && elapsed < MIN_ANIMATION_DURATION) {
+      const easeFactor = Math.min(0.15, Math.abs(normalizedDiff) * 0.3);
+      controlsRef.current.setAzimuthalAngle(
+        currentAzimuthal + normalizedDiff * easeFactor,
+      );
+    } else {
+      // Force complete after minimum duration
+      setIsAnimating(false);
+      onComplete();
     }
   });
+
+  useEffect(() => {
+    if (targetRotation !== undefined) {
+      startTimeRef.current = performance.now();
+      setIsAnimating(true);
+    }
+  }, [targetRotation]);
+
   return null;
 }
 
 function CityScene({
   targetRotation,
   controlsRef,
+  onTransitionComplete,
 }: {
   targetRotation: number;
   controlsRef: React.RefObject<any>;
+  onTransitionComplete: () => void;
 }) {
   return (
     <>
@@ -148,6 +172,7 @@ function CityScene({
       <RotatingControls
         targetRotation={targetRotation}
         controlsRef={controlsRef}
+        onComplete={onTransitionComplete}
       />
     </>
   );
@@ -156,9 +181,16 @@ function CityScene({
 export default function Home() {
   const [currentView, setCurrentView] = useState(0);
   const [targetRotation, setTargetRotation] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   const controlsRef = useRef<any>(null);
 
   const rotateToView = (direction: "next" | "prev") => {
+    if (isTransitioning) return;
+
+    // Reset immediately for instant responsiveness
+    setIsTransitioning(true);
+
     const newView =
       direction === "next" ? (currentView + 1) % 6 : (currentView - 1 + 6) % 6;
 
@@ -172,7 +204,7 @@ export default function Home() {
         {/* Left Previous Button */}
         <button
           onClick={() => rotateToView("prev")}
-          className="absolute left-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl"
+          className={`absolute left-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl ${isTransitioning ? "opacity-50 cursor-not-allowed animate-pulse" : ""}`}
           title="Previous View"
         >
           ←
@@ -181,7 +213,7 @@ export default function Home() {
         {/* Right Next Button */}
         <button
           onClick={() => rotateToView("next")}
-          className="absolute right-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl"
+          className={`absolute right-8 top-1/2 -translate-y-1/2 px-4 py-4 bg-gray-700/90 hover:bg-gray-600 text-white font-bold rounded-xl shadow-lg transition-all border border-gray-600 hover:shadow-xl hover:border-gray-500 backdrop-blur-sm z-10 w-14 h-14 flex items-center justify-center text-xl ${isTransitioning ? "opacity-50 cursor-not-allowed animate-pulse" : ""}`}
           title="Next View"
         >
           →
@@ -193,6 +225,12 @@ export default function Home() {
               <CityScene
                 targetRotation={targetRotation}
                 controlsRef={controlsRef}
+                onTransitionComplete={() => {
+                  // Add small delay to ensure frame completes
+                  requestAnimationFrame(() => {
+                    setIsTransitioning(false);
+                  });
+                }}
               />
               <OrbitControls
                 ref={controlsRef}
@@ -201,6 +239,7 @@ export default function Home() {
                 enableRotate={false}
                 minDistance={15}
                 maxDistance={50}
+                makeDefault
               />
             </Suspense>
           </Canvas>
