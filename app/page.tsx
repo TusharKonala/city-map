@@ -93,13 +93,21 @@ function Building({
 function Marker({
   position,
   id,
+  onSelect,
 }: {
   position: [number, number, number];
   id: number;
+  onSelect: (id: number) => void;
 }) {
   return (
     <group position={position}>
-      <Sphere args={[0.5, 16, 16]}>
+      <Sphere
+        args={[0.5, 16, 16]}
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect(id);
+        }}
+      >
         <meshStandardMaterial
           color="#f56565"
           emissive="#f56565"
@@ -176,10 +184,12 @@ function CityScene({
   targetRotation,
   controlsRef,
   onTransitionComplete,
+  onMarkerSelect,
 }: {
   targetRotation: number;
   controlsRef: React.RefObject<any>;
   onTransitionComplete: () => void;
+  onMarkerSelect: (id: number) => void;
 }) {
   return (
     <>
@@ -234,12 +244,36 @@ function CityScene({
       />
 
       {/* 6 Markers */}
-      <Marker position={[5, 0, 5] as [number, number, number]} id={1} />
-      <Marker position={[-8, 0, 3] as [number, number, number]} id={2} />
-      <Marker position={[2, 0, -10] as [number, number, number]} id={3} />
-      <Marker position={[12, 0, -5] as [number, number, number]} id={4} />
-      <Marker position={[-5, 0, 12] as [number, number, number]} id={5} />
-      <Marker position={[8, 0, 8] as [number, number, number]} id={6} />
+      <Marker
+        position={[5, 0, 5] as [number, number, number]}
+        id={1}
+        onSelect={onMarkerSelect}
+      />
+      <Marker
+        position={[-8, 0, 3] as [number, number, number]}
+        id={2}
+        onSelect={onMarkerSelect}
+      />
+      <Marker
+        position={[2, 0, -10] as [number, number, number]}
+        id={3}
+        onSelect={onMarkerSelect}
+      />
+      <Marker
+        position={[12, 0, -5] as [number, number, number]}
+        id={4}
+        onSelect={onMarkerSelect}
+      />
+      <Marker
+        position={[-5, 0, 12] as [number, number, number]}
+        id={5}
+        onSelect={onMarkerSelect}
+      />
+      <Marker
+        position={[8, 0, 8] as [number, number, number]}
+        id={6}
+        onSelect={onMarkerSelect}
+      />
 
       <RotatingControls
         targetRotation={targetRotation}
@@ -301,10 +335,93 @@ function HexCompass({
   );
 }
 
+function MarkerDetailCard({
+  markerId,
+  onClose,
+}: {
+  markerId: number;
+  onClose: () => void;
+}) {
+  const data = MARKER_DATA[markerId];
+  if (!data) return null;
+
+  return (
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm">
+      <div className="bg-gradient-to-br from-yellow-500 to-amber-800 p-[2px] rounded-xl">
+        <div className="bg-gray-900 rounded-xl p-4 text-white">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-lg font-bold">{data.title}</h2>
+            <button onClick={onClose} className="text-gray-400">
+              ✕
+            </button>
+          </div>
+
+          <p className="text-sm text-gray-300">Level: {data.level}</p>
+          <p className="text-sm text-gray-300">Element: {data.element}</p>
+
+          <div className="mt-3 flex justify-between text-sm">
+            <span>⚔️ Attack: {data.attack}</span>
+            <span>🛡 Defense: {data.defense}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const MARKER_DATA: Record<
+  number,
+  {
+    title: string;
+    level: number;
+    element: string;
+    attack: number;
+    defense: number;
+  }
+> = {
+  1: {
+    title: "Fire Tower",
+    level: 5,
+    element: "Fire",
+    attack: 80,
+    defense: 40,
+  },
+  2: { title: "Ice Gate", level: 3, element: "Ice", attack: 50, defense: 60 },
+  3: {
+    title: "Earth Node",
+    level: 4,
+    element: "Earth",
+    attack: 65,
+    defense: 70,
+  },
+  4: {
+    title: "Wind Spire",
+    level: 6,
+    element: "Wind",
+    attack: 90,
+    defense: 30,
+  },
+  5: {
+    title: "Shadow Hub",
+    level: 7,
+    element: "Dark",
+    attack: 95,
+    defense: 50,
+  },
+  6: {
+    title: "Crystal Core",
+    level: 10,
+    element: "Light",
+    attack: 120,
+    defense: 90,
+  },
+};
+
 export default function Home() {
   const [currentView, setCurrentView] = useState(0);
   const [targetRotation, setTargetRotation] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
 
   const controlsRef = useRef<any>(null);
 
@@ -362,6 +479,7 @@ export default function Home() {
                     setIsTransitioning(false);
                   });
                 }}
+                onMarkerSelect={(id) => setSelectedMarker(id)}
               />
               <OrbitControls
                 ref={controlsRef}
@@ -376,6 +494,12 @@ export default function Home() {
           </Canvas>
         </div>
         <HexCompass activeIndex={currentView} onSelect={rotateToIndex} />
+        {selectedMarker && (
+          <MarkerDetailCard
+            markerId={selectedMarker}
+            onClose={() => setSelectedMarker(null)}
+          />
+        )}
       </div>
     </main>
   );
