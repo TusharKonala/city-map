@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Sphere, Text } from "@react-three/drei";
+import { OrbitControls, Sphere, Text, useGLTF } from "@react-three/drei";
 import { Suspense, useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { useThree } from "@react-three/fiber";
@@ -24,6 +24,31 @@ function Skybox() {
   }, [scene]);
 
   return null;
+}
+
+function GLBModel({
+  path,
+  position = [0, 0, 0],
+  targetSize = 10, // desired max size in world units
+}: {
+  path: string;
+  position?: [number, number, number];
+  targetSize?: number;
+}) {
+  const { scene } = useGLTF(path);
+
+  useEffect(() => {
+    const box = new THREE.Box3().setFromObject(scene);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+
+    const maxAxis = Math.max(size.x, size.y, size.z);
+    const scale = targetSize / maxAxis;
+
+    scene.scale.setScalar(scale);
+  }, [scene, targetSize]);
+
+  return <primitive object={scene} position={position} />;
 }
 
 function CityGround() {
@@ -162,6 +187,23 @@ function CityScene({
       />
       <CityGround />
 
+      {/* Assembled GLB assets from ZIP */}
+      <GLBModel path="/models/map.glb" scale={2} />
+
+      <GLBModel path="/models/wallGate.glb" position={[0, 0, -8]} scale={1.5} />
+
+      <GLBModel
+        path="/models/fireTower.glb"
+        position={[11, 0, 7]}
+        scale={1.5}
+      />
+
+      <GLBModel
+        path="/models/centerCrystal.glb"
+        position={[0, 0, 0]}
+        scale={1.2}
+      />
+
       {/* 4 Buildings */}
       <Building
         position={[-10, 0, -10] as [number, number, number]}
@@ -271,3 +313,8 @@ export default function Home() {
     </main>
   );
 }
+
+useGLTF.preload("/models/map.glb");
+useGLTF.preload("/models/wallGate.glb");
+useGLTF.preload("/models/fireTower.glb");
+useGLTF.preload("/models/centerCrystal.glb");
