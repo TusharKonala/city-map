@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ADD THESE FOR 3D MAP */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.r3f-canvas {
+  cursor: grab;
+}
+
+.r3f-canvas:active {
+  cursor: grabbing;
+}
