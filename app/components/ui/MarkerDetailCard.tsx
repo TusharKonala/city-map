@@ -11,7 +11,7 @@ export function MarkerDetailCard({
   if (!data) return null;
 
   return (
-    <div className="fixed left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-sm bottom-[env(safe-area-inset-bottom)] mb-4">
+    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-sm">
       <div className="bg-gradient-to-br from-yellow-500 to-amber-800 p-[2px] rounded-xl">
         <div className="bg-gray-900 rounded-xl p-4 text-white">
           <div className="flex justify-between items-center mb-2">
