@@ -8,40 +8,59 @@ export const MARKER_DATA: Record<
     defense: number;
   }
 > = {
-  1: {
+  2: {
+    title: "Crystal Core",
+    level: 10,
+    element: "Light",
+    attack: 120,
+    defense: 90,
+  },
+
+  7: {
     title: "Fire Tower",
     level: 5,
     element: "Fire",
     attack: 80,
     defense: 40,
   },
-  2: { title: "Ice Gate", level: 3, element: "Ice", attack: 50, defense: 60 },
-  3: {
-    title: "Earth Node",
+
+  8: {
+    title: "Water Tower",
     level: 4,
-    element: "Earth",
-    attack: 65,
+    element: "Water",
+    attack: 60,
     defense: 70,
   },
-  4: {
-    title: "Wind Spire",
+
+  9: {
+    title: "Wind Tower",
     level: 6,
     element: "Wind",
     attack: 90,
     defense: 30,
   },
-  5: {
-    title: "Shadow Hub",
+
+  10: {
+    title: "Light Tower",
+    level: 7,
+    element: "Light",
+    attack: 95,
+    defense: 60,
+  },
+
+  11: {
+    title: "Dark Tower",
     level: 7,
     element: "Dark",
-    attack: 95,
-    defense: 50,
+    attack: 100,
+    defense: 55,
   },
-  6: {
-    title: "Crystal Core",
-    level: 10,
-    element: "Light",
-    attack: 120,
-    defense: 90,
+
+  12: {
+    title: "Ballista",
+    level: 5,
+    element: "Siege",
+    attack: 85,
+    defense: 35,
   },
 };

@@ -82,7 +82,7 @@ export default function Home() {
             mt-16 md:mt-0
           "
         >
-          <Canvas camera={{ position: [0, 15, 25], fov: 60 }} shadows>
+          <Canvas camera={{ position: [0, 25, 40], fov: 60 }} shadows>
             <Suspense fallback={null}>
               <CityScene
                 targetRotation={targetRotation}
