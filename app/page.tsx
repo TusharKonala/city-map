@@ -42,7 +42,7 @@ export default function Home() {
           disabled={isTransitioning}
           onClick={() => rotateToView("prev")}
           className={`
-    nav-arrow-btn left-4 md:left-8
+    nav-arrow-btn left-4 lg:left-8
     ${isTransitioning ? "nav-arrow-btn-disabled" : "nav-arrow-btn-enabled"}
   `}
         >
@@ -54,7 +54,7 @@ export default function Home() {
           disabled={isTransitioning}
           onClick={() => rotateToView("next")}
           className={`
-    nav-arrow-btn right-4 md:right-8
+    nav-arrow-btn right-4 lg:right-8
     ${isTransitioning ? "nav-arrow-btn-disabled" : "nav-arrow-btn-enabled"}
   `}
         >
@@ -66,8 +66,8 @@ export default function Home() {
           className="
             relative w-full mx-auto rounded-2xl overflow-hidden
             shadow-2xl border-4 border-gray-700
-            h-[300px] md:h-[600px]
-            mt-16 md:mt-0
+            h-[300px] lg:h-[600px]
+            mt-16 lg:mt-0
           "
         >
           <Canvas camera={{ position: [0, 25, 40], fov: 60 }} shadows>
