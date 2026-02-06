@@ -41,16 +41,10 @@ export default function Home() {
         <button
           disabled={isTransitioning}
           onClick={() => rotateToView("prev")}
-          className={`absolute left-8 top-1/2 -translate-y-1/2
-            w-14 h-14 flex items-center justify-center text-xl
-            bg-gray-700/90 text-white font-bold rounded-xl
-            border border-gray-600 shadow-lg backdrop-blur-sm z-10
-            transition-all
-            ${
-              isTransitioning
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-600 hover:border-gray-500"
-            }`}
+          className={`
+    nav-arrow-btn left-4 md:left-8
+    ${isTransitioning ? "nav-arrow-btn-disabled" : "nav-arrow-btn-enabled"}
+  `}
         >
           ←
         </button>
@@ -59,16 +53,10 @@ export default function Home() {
         <button
           disabled={isTransitioning}
           onClick={() => rotateToView("next")}
-          className={`absolute right-8 top-1/2 -translate-y-1/2
-            w-14 h-14 flex items-center justify-center text-xl
-            bg-gray-700/90 text-white font-bold rounded-xl
-            border border-gray-600 shadow-lg backdrop-blur-sm z-10
-            transition-all
-            ${
-              isTransitioning
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-600 hover:border-gray-500"
-            }`}
+          className={`
+    nav-arrow-btn right-4 md:right-8
+    ${isTransitioning ? "nav-arrow-btn-disabled" : "nav-arrow-btn-enabled"}
+  `}
         >
           →
         </button>

@@ -45,3 +45,34 @@ body {
 .r3f-canvas:active {
   cursor: grabbing;
 }
+
+@layer components {
+  .hex-compass {
+    @apply fixed z-30 w-28 h-28
+      top-2 left-1/2 -translate-x-1/2
+      md:top-6 md:right-6 md:left-auto md:translate-x-0;
+  }
+
+  .nav-arrow-btn {
+    @apply fixed top-1/2 -translate-y-1/2
+      flex items-center justify-center
+      text-xl font-bold text-white
+      bg-gray-700/90
+      rounded-xl
+      border border-gray-600
+      shadow-lg
+      backdrop-blur-sm
+      z-10
+      transition-all
+      w-10 h-10 text-lg
+      md:w-14 md:h-14 md:text-xl;
+  }
+
+  .nav-arrow-btn-enabled {
+    @apply hover:bg-gray-600 hover:border-gray-500;
+  }
+
+  .nav-arrow-btn-disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+}

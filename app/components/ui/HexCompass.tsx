@@ -16,13 +16,7 @@ export function HexCompass({
   ];
 
   return (
-    <div
-      className="
-    absolute z-30 w-28 h-28
-    top-2 left-1/2 -translate-x-1/2
-    md:top-6 md:right-6 md:left-auto md:translate-x-0
-  "
-    >
+    <div className="hex-compass">
       <svg viewBox="0 0 100 100" className="w-full h-full">
         {points.map((p, i) => {
           const next = points[(i + 1) % points.length];

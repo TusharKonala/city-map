@@ -47,9 +47,9 @@ export function CityScene({
             id={asset.id}
             onSelect={onMarkerSelect}
             position={[
-              asset.position[0] + asset.markerOffset[0],
-              asset.position[1] + asset.markerOffset[1],
-              asset.position[2] + asset.markerOffset[2],
+              asset.position[0] + asset.markerOffset![0],
+              asset.position[1] + asset.markerOffset![1],
+              asset.position[2] + asset.markerOffset![2],
             ]}
           />
         ),
