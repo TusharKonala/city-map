@@ -18,7 +18,7 @@ export const ASSETS: AssetConfig[] = [
     model: "/models/centerCrystal.glb",
     position: [0, -3, 0],
     scale: 1,
-    markerOffset: [3, 8, 0],
+    markerOffset: [3, 17, 0],
   },
   {
     id: 3,
@@ -49,7 +49,7 @@ export const ASSETS: AssetConfig[] = [
     model: "/models/fireTower.glb",
     position: [16.5, 4.5, 9.5],
     scale: 0.9,
-    markerOffset: [0, 0, -2.5],
+    markerOffset: [0, 9, -2.5],
   },
 
   {
@@ -57,7 +57,7 @@ export const ASSETS: AssetConfig[] = [
     model: "/models/waterTower.glb",
     position: [-15, 4.5, 9],
     scale: 0.9,
-    markerOffset: [-2.5, 0, 0],
+    markerOffset: [-2.5, 9.5, 0],
   },
 
   {
@@ -65,7 +65,7 @@ export const ASSETS: AssetConfig[] = [
     model: "/models/windTower.glb",
     position: [-16, 4.5, -9],
     scale: 0.9,
-    markerOffset: [-2, 0, -1],
+    markerOffset: [-2, 8.5, -1],
   },
 
   {
@@ -73,7 +73,7 @@ export const ASSETS: AssetConfig[] = [
     model: "/models/lightTower.glb",
     position: [16, 4.5, -9],
     scale: 0.9,
-    markerOffset: [2, 0, 0],
+    markerOffset: [2, 8.5, 0],
   },
 
   {
@@ -81,13 +81,13 @@ export const ASSETS: AssetConfig[] = [
     model: "/models/darkTower.glb",
     position: [0, 4.5, -18],
     scale: 0.9,
-    markerOffset: [-2, 0, -1],
+    markerOffset: [-2, 9.5, -1],
   },
   {
     id: 12,
     model: "/models/ballista.glb",
     position: [0, 4.5, 17],
     scale: 1.1,
-    markerOffset: [1.9, 0, 2],
+    markerOffset: [1.9, 7, 2],
   },
 ];

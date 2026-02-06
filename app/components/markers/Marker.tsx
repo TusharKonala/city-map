@@ -12,7 +12,9 @@ export function Marker({ position, id, onSelect }: Props) {
   return (
     <group position={position}>
       <Sphere
-        args={[0.5, 16, 16]}
+        args={[0.75, 16, 16]}
+        onPointerOver={() => (document.body.style.cursor = "pointer")}
+        onPointerOut={() => (document.body.style.cursor = "default")}
         onClick={(e) => {
           e.stopPropagation();
           onSelect(id);
